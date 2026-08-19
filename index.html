@@ -65,7 +65,7 @@
   .brand{
     font-family:'Fraunces', serif;
     font-weight:600;
-    font-size:1.05rem;
+    font-size:1.4rem;
     letter-spacing:-0.01em;
     display:flex; align-items:baseline; gap:8px;
   }
@@ -144,6 +144,49 @@
   }
   .swatch-dots span:first-child{ margin-left:0; }
   .swatch-label{ font-size:0.82rem; font-weight:500; }
+
+
+  /* ---------- Left side tabs ---------- */
+  .side-tabs{
+    position:fixed;
+    top:120px;
+    left:10px;
+    z-index:40;
+    background:rgba(255,255,255,0.85);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    backdrop-filter:blur(8px);
+  }
+  .side-tabs ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .side-tabs li{ margin-bottom:4px; }
+  .side-tabs a{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    text-decoration:none;
+    padding:6px 10px;
+    border-radius:6px;
+    color:var(--ink-soft);
+    border:1px solid transparent;
+  }
+  .side-tabs a:hover{
+    border-color:var(--accent-strong);
+    color:var(--accent-strong);
+  }
+  @media (max-width:768px){
+    .side-tabs{
+      position:static;
+      margin:8px auto 0;
+      max-width:1080px;
+    }
+    .side-tabs ul{ display:flex; flex-wrap:wrap; gap:6px; }
+    .side-tabs li{ margin-bottom:0; }
+  }
 
   /* ---------- Hero ---------- */
   .hero{ padding:76px 0 56px; }
@@ -232,7 +275,7 @@
   }
 
   /* Track visibility */
-  [data-track]{ display:none; }
+  [data-track]{ display:block; }
   [data-track].track-visible{ display:block; }
   .track-both{ display:block !important; }
 
@@ -269,7 +312,7 @@
   .pc-desc{ color:var(--ink-soft); font-size:0.95rem; margin:10px 0 16px; max-width:70ch; }
   .pc-stats{ display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:16px; }
   .pc-stat{ font-family:'JetBrains Mono', monospace; font-size:0.8rem; }
-  .pc-stat b{ color:var(--accent-strong); display:block; font-size:1.05rem; }
+  .pc-stat b{ color:var(--accent-strong); display:block; font-size:1.4rem; }
   .pc-stack{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
   .chip{
     font-size:0.75rem;
@@ -451,10 +494,6 @@
   <div class="wrap topbar-inner">
     <div class="brand">Charithra Chandrashekar<span class="dot">.</span></div>
 
-    <nav class="track-toggle" role="tablist" aria-label="Choose portfolio view">
-      <button type="button" id="btn-research" role="tab" aria-selected="true">Research</button>
-      <button type="button" id="btn-industry" role="tab" aria-selected="false">Industry</button>
-    </nav>
 
     <div class="top-actions" style="position:relative;">
       <button class="palette-btn" id="paletteBtn" aria-label="Change colour palette" aria-haspopup="true" aria-expanded="false"></button>
@@ -466,12 +505,24 @@
   </div>
 </header>
 
+<nav class="side-tabs" aria-label="Page sections">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#certifications">Certifications</a></li>
+  </ul>
+</nav>
+
 <main id="main">
 
   <!-- ================= HERO ================= -->
-  <section class="hero" style="border-top:none; padding-top:64px;">
+  <section id="overview" class="hero" style="border-top:none; padding-top:64px;">
     <div class="wrap">
-      <div class="eyebrow"><span class="edge"></span> Machine Learning Engineer · Munich</div>
+      <div class="eyebrow"><span class="edge"></span> Machine Learning Engineer</div>
       <h1>
         Building systems where
         <span class="role">graphs, language models,</span>
@@ -485,8 +536,7 @@
       <div class="hero-meta">
         <a href="mailto:charithra.chandrashekar@outlook.com">charithra.chandrashekar@outlook.com</a>
         <a href="https://www.linkedin.com/in/charithra-chandrashekar" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://github.com/charithracrs" target="_blank" rel="noopener">GitHub ↗</a>
-        <span>Bengaluru → Munich</span>
+        <a href="https://github.com/charithra-chandrashekar" target="_blank" rel="noopener">GitHub ↗</a>
       </div>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#projects">View projects</a>
@@ -522,7 +572,7 @@
     <div class="wrap">
       <div class="section-head">
         <h2>Selected projects</h2>
-        <span class="section-num mono">01 — from github.com/charithracrs</span>
+        <span class="section-num mono">01 — from github.com/charithra-chandrashekar</span>
       </div>
 
       <div class="project-grid">
@@ -558,7 +608,7 @@
         <!-- Portfolio site repo — industry -->
         <article class="project-card track-both" data-track="industry">
           <div class="pc-top">
-            <h3 class="pc-title"><a href="https://github.com/charithracrs/charithra-chandrashekar" target="_blank" rel="noopener">Personal Portfolio Site</a></h3>
+            <h3 class="pc-title"><a href="https://github.com/charithra-chandrashekar/charithra-chandrashekar.github.io" target="_blank" rel="noopener">Personal Portfolio Site</a></h3>
             <span class="pc-tag">Web</span>
           </div>
           <p class="pc-desc">
@@ -570,7 +620,7 @@
             <span class="chip">Static site</span>
           </div>
           <div class="pc-links">
-            <a class="pc-link" href="https://github.com/charithracrs/charithra-chandrashekar" target="_blank" rel="noopener">Repository →</a>
+            <a class="pc-link" href="https://github.com/charithra-chandrashekar/charithra-chandrashekar.github.io" target="_blank" rel="noopener">Repository →</a>
           </div>
         </article>
 
@@ -684,7 +734,7 @@
   </section>
 
   <!-- ================= RESEARCH DETAIL (research track only) ================= -->
-  <section data-track="research">
+  <section id="research" data-track="research">
     <div class="wrap">
       <div class="section-head">
         <h2>Research</h2>
@@ -796,11 +846,11 @@
 
 <footer>
   <div class="wrap footer-row">
-    <div class="footer-note">Bengaluru → Munich · Built as a static site</div>
+    <div class="footer-note">Built as a static site</div>
     <div class="footer-links">
       <a href="mailto:charithra.chandrashekar@outlook.com">Email</a>
       <a href="https://www.linkedin.com/in/charithra-chandrashekar" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/charithracrs" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/charithra-chandrashekar" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 </footer>
@@ -932,30 +982,6 @@
   var savedPalette = localStorage.getItem('cc_palette') || 'navy_teal_skyblue_white';
   applyPalette(savedPalette);
 
-  // ---------- Research / Industry track toggle ----------
-  var btnResearch = document.getElementById('btn-research');
-  var btnIndustry = document.getElementById('btn-industry');
-
-  function setTrack(track){
-    document.querySelectorAll('[data-track]').forEach(function(el){
-      if(el.classList.contains('track-both')) return;
-      var show = el.dataset.track === track;
-      el.classList.toggle('track-visible', show);
-    });
-    document.querySelectorAll('[data-track-tag]').forEach(function(el){
-      // no-op placeholder for future per-track tag text if needed
-    });
-    btnResearch.classList.toggle('active', track==='research');
-    btnResearch.setAttribute('aria-selected', track==='research');
-    btnIndustry.classList.toggle('active', track==='industry');
-    btnIndustry.setAttribute('aria-selected', track==='industry');
-    localStorage.setItem('cc_track', track);
-  }
-
-  btnResearch.addEventListener('click', function(){ setTrack('research'); });
-  btnIndustry.addEventListener('click', function(){ setTrack('industry'); });
-
-  setTrack(localStorage.getItem('cc_track') || 'research');
 })();
 </script>
 
