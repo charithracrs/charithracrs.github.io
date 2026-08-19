@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   :root{
     /* runtime palette variables — set by JS from colour_palettes.json */
@@ -365,6 +366,26 @@
   }
   .cert-thumb .cert-pdf-tile:hover{ color:var(--accent-strong); }
   .cert-thumb .cert-pdf-tile svg{ opacity:0.7; }
+  .cert-thumb a.cert-pdf-preview{
+    display:block; width:100%; height:100%;
+    position:relative;
+  }
+  .cert-thumb a.cert-pdf-preview canvas{
+    width:100%; height:100%;
+    object-fit:cover; object-position:top;
+    display:block;
+  }
+  .cert-thumb .cert-pdf-badge{
+    position:absolute; top:8px; right:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.62rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:3px 7px;
+    border-radius:4px;
+    background:rgba(0,0,0,0.55);
+    color:#fff;
+  }
   .cert-body{ padding:16px 18px 18px; flex:1; display:flex; flex-direction:column; }
   .cert-title{ font-family:'Fraunces', serif; font-weight:600; font-size:0.98rem; line-height:1.3; margin-bottom:4px; }
   .cert-issuer{ font-size:0.82rem; color:var(--ink-soft); margin-bottom:10px; }
@@ -948,8 +969,10 @@
    link     (optional) — verification URL, or leave "" to omit the link
    image    (optional) — path to a local file, e.g. "certs/ibm-genai.png"
                           PNG, JPG, and PDF are all supported.
-                          PDFs show as a "View PDF certificate" tile
-                          that opens the file in a new tab.
+                          PDFs render their first page as a thumbnail
+                          (via PDF.js), clickable to open the full file.
+                          If rendering fails (e.g. offline), it falls
+                          back to a simple "View PDF certificate" tile.
                           Leave "" to show a plain placeholder instead.
    status   (optional) — e.g. "In progress". Leave "" for completed certs.
 
@@ -1028,6 +1051,65 @@ var CERTS = [
     return /\.pdf($|\?)/i.test(path);
   }
 
+  // Point PDF.js at its matching worker build on the same CDN
+  if(window.pdfjsLib){
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  function renderPdfThumb(thumb, path, title, issuer){
+    // Fallback tile shown immediately; replaced by a canvas if rendering succeeds
+    function showFallbackTile(){
+      thumb.innerHTML = '';
+      var pdfTile = document.createElement('a');
+      pdfTile.className = 'cert-pdf-tile';
+      pdfTile.href = path;
+      pdfTile.target = '_blank';
+      pdfTile.rel = 'noopener';
+      pdfTile.innerHTML = pdfSVG + '<span>View PDF certificate</span>';
+      thumb.appendChild(pdfTile);
+    }
+
+    if(!window.pdfjsLib){
+      showFallbackTile();
+      return;
+    }
+
+    window.pdfjsLib.getDocument(path).promise
+      .then(function(pdf){ return pdf.getPage(1); })
+      .then(function(page){
+        var viewport = page.getViewport({ scale: 1 });
+        // render at a fixed pixel width for a crisp, consistent thumbnail
+        var targetWidth = 500;
+        var scale = targetWidth / viewport.width;
+        var scaledViewport = page.getViewport({ scale: scale });
+
+        var canvas = document.createElement('canvas');
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+        var ctx = canvas.getContext('2d');
+
+        return page.render({ canvasContext: ctx, viewport: scaledViewport }).promise.then(function(){
+          thumb.innerHTML = '';
+          var link = document.createElement('a');
+          link.className = 'cert-pdf-preview';
+          link.href = path;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.setAttribute('aria-label', 'Open PDF certificate: ' + title + ' — ' + issuer);
+          link.appendChild(canvas);
+          var badge = document.createElement('span');
+          badge.className = 'cert-pdf-badge';
+          badge.textContent = 'PDF';
+          link.appendChild(badge);
+          thumb.appendChild(link);
+        });
+      })
+      .catch(function(){
+        showFallbackTile();
+      });
+  }
+
   CERTS.forEach(function(cert){
     var card = document.createElement('div');
     card.className = 'cert-card';
@@ -1036,14 +1118,10 @@ var CERTS = [
     thumb.className = 'cert-thumb';
 
     if(cert.image && isPDF(cert.image)){
-      // PDF: show a clickable tile that opens the file, no broken <img> attempt
-      var pdfTile = document.createElement('a');
-      pdfTile.className = 'cert-pdf-tile';
-      pdfTile.href = cert.image;
-      pdfTile.target = '_blank';
-      pdfTile.rel = 'noopener';
-      pdfTile.innerHTML = pdfSVG + '<span>View PDF certificate</span>';
-      thumb.appendChild(pdfTile);
+      // Show a lightweight placeholder immediately, then swap in a rendered
+      // first-page thumbnail once PDF.js finishes (or fall back gracefully).
+      thumb.innerHTML = '<div class="cert-fallback">' + pdfSVG + 'Loading preview…</div>';
+      renderPdfThumb(thumb, cert.image, cert.title, cert.issuer);
     } else if(cert.image){
       var img = document.createElement('img');
       img.src = cert.image;
